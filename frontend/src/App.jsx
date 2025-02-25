@@ -6,6 +6,7 @@ import StudentLogin from './pages/auth-page/student-auth';
 import FacultyLogin from './pages/auth-page/faculty-auth';
 import AdminLogin from './pages/auth-page/admin-auth';
 import StudentDashboard from './pages/dashboard/student/student-dashboard';
+import ExamPage from './pages/exam-portal/exam-page'; // Import exam-page component
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -35,6 +36,9 @@ function App() {
         <Route path="/auth/student" element={<StudentLogin />} />
         <Route path="/auth/faculty" element={<FacultyLogin />} />
         <Route path="/auth/admin" element={<AdminLogin />} />
+
+        {/* Exam Page Route */}
+        <Route path="/exam" element={<ExamPage />} />
 
         {/* Protected Student Dashboard Route */}
         <Route 

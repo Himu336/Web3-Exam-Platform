@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import sequelize from './config/database.js';
 import authRoutes from './routes/auth.routes.js';
+import examRoutes from "./routes/exam.routes.js";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use("/api/exam", examRoutes);
 
 // Database & Server
 const PORT = process.env.PORT || 5000;
