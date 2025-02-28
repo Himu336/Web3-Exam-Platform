@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.28;
 
 contract ExamContract {
     struct Exam {
@@ -15,6 +15,7 @@ contract ExamContract {
         string questionText;
         string[] options;
         uint correctOptionID; // Hidden from students
+        address faculty;
     }
 
     struct Submission {
@@ -52,11 +53,25 @@ contract ExamContract {
     }
 
     // Step 2: Faculty adds Questions
+    mapping(address => bool) public faculty; // List of faculty addresses
+    
+    function addFaculty(address _faculty) public {
+        require(msg.sender == admin, "Only admin can assign faculty role");
+        faculty[_faculty] = true;
+    }
+    
     function addQuestion(
-        uint _examID, uint _questionID, string memory _questionText, string[] memory _options, uint _correctOptionID
+        uint _examID,
+        uint _questionID,
+        string memory _questionText,
+        string[] memory _options,
+        uint _correctOptionID
     ) public {
-        require(msg.sender == admin, "Only admin/faculty can add questions");
-        examQuestions[_examID].push(Question(_questionID, _questionText, _options, _correctOptionID));
+        require(faculty[msg.sender], "Only faculty can add questions");
+        require(_options.length == 4, "Exactly 4 options required");
+        examQuestions[_examID].push(
+            Question(_questionID, _questionText, _options, _correctOptionID, msg.sender)
+        );
     }
 
     // Step 3: Student submits answers
