@@ -1,246 +1,226 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Profile = () => {
+  const { currentUser, getProfile } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user'));
-
   const [formData, setFormData] = useState({
-    name: user?.name || 'John Doe',
-    rollNumber: user?.roleId || 'CS2023001',
-    email: user?.email || 'john.doe@example.com',
-    dateOfBirth: '2000-08-15',
-    contactNumber: '+91 9876543210',
-    department: 'Computer Science',
-    course: 'B.Tech Computer Science & Engineering',
-    semester: '6th',
-    batch: '2021-2025',
-    gender: 'Male',
-    fatherName: 'Robert Doe',
-    motherName: 'Sarah Doe',
-    residenceState: 'Maharashtra',
-    address: '123, Example Street, Example City - 400001'
+    username: '',
+    email: '',
+    rollNumber: '',
+    program: '',
+    semester: ''
   });
 
-  const handleInputChange = (e) => {
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await getProfile();
+        setProfile(response.data);
+        setFormData({
+          username: response.data.username,
+          email: response.data.email,
+          rollNumber: response.data.rollNumber || '',
+          program: response.data.program || '',
+          semester: response.data.semester || ''
+        });
+      } catch (err) {
+        setError('Failed to load profile data');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [getProfile]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value
-    }));
+    });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement profile update logic
+    // This would typically call an API to update the profile
+    // For now, we'll just simulate a successful update
+    setProfile({
+      ...profile,
+      ...formData
+    });
     setIsEditing(false);
   };
 
+  if (loading) {
+    return <div className="flex justify-center items-center h-64">Loading profile...</div>;
+  }
+
+  if (error) {
+    return <div className="bg-red-100 p-4 rounded-md text-red-600">{error}</div>;
+  }
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-2xl font-bold text-slate-800">Profile Information</h3>
-        <div className="flex gap-4">
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="px-4 py-2 flex items-center gap-2 bg-white text-slate-700 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
-          >
-            <span>✏️</span>
-            {isEditing ? 'Cancel Editing' : 'Edit Profile'}
-          </button>
-          {isEditing && (
+    <div className="bg-white rounded-lg shadow">
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold">Student Profile</h2>
+          {!isEditing && (
             <button
-              onClick={handleSubmit}
-              className="px-4 py-2 flex items-center gap-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              <span>💾</span>
-              Save Changes
+              Edit Profile
             </button>
           )}
         </div>
-      </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Left Column - Photo */}
-          <div className="md:w-1/3">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="w-48 h-48 rounded-full border-4 border-slate-200 overflow-hidden">
-                <img 
-                  src="https://placekitten.com/200/200"
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <button 
-                className="px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                id="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                disabled
+              />
+              <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
+            </div>
+
+            <div>
+              <label htmlFor="rollNumber" className="block text-sm font-medium text-gray-700">
+                Roll Number
+              </label>
+              <input
+                type="text"
+                name="rollNumber"
+                id="rollNumber"
+                value={formData.rollNumber}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="program" className="block text-sm font-medium text-gray-700">
+                Program
+              </label>
+              <input
+                type="text"
+                name="program"
+                id="program"
+                value={formData.program}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="semester" className="block text-sm font-medium text-gray-700">
+                Semester
+              </label>
+              <input
+                type="text"
+                name="semester"
+                id="semester"
+                value={formData.semester}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
-                Change Photo
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Save
               </button>
             </div>
-          </div>
-
-          {/* Right Column - Details Form */}
-          <div className="md:w-2/3">
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Personal Information */}
-              <div className="md:col-span-2">
-                <h4 className="font-semibold text-slate-800 mb-4">Personal Information</h4>
+          </form>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex items-center justify-center mb-8">
+              <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-semibold text-blue-700">
+                {profile?.username?.charAt(0).toUpperCase() || 'S'}
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Full Name</label>
-                <input 
-                  type="text"
-                  name="name"
-                  className={`mt-1 p-2 w-full border rounded-md ${
-                    isEditing ? 'bg-white border-slate-300 focus:ring-indigo-500 focus:border-indigo-500' : 'bg-slate-50 border-slate-200'
-                  }`}
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-500">Username</h3>
+                <p className="mt-1 text-lg">{profile?.username}</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Roll Number</label>
-                <input 
-                  type="text"
-                  name="rollNumber"
-                  className="mt-1 p-2 w-full border border-slate-200 rounded-md bg-slate-50"
-                  value={formData.rollNumber}
-                  readOnly
-                />
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-500">Email</h3>
+                <p className="mt-1 text-lg">{profile?.email}</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Date of Birth</label>
-                <input 
-                  type="date"
-                  name="dateOfBirth"
-                  className={`mt-1 p-2 w-full border rounded-md ${isEditing ? 'bg-white' : 'bg-slate-50'}`}
-                  value={formData.dateOfBirth}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                />
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-500">Roll Number</h3>
+                <p className="mt-1 text-lg">{profile?.rollNumber || 'Not specified'}</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Gender</label>
-                <select
-                  name="gender"
-                  className={`mt-1 p-2 w-full border rounded-md ${isEditing ? 'bg-white' : 'bg-slate-50'}`}
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-500">Program</h3>
+                <p className="mt-1 text-lg">{profile?.program || 'Not specified'}</p>
               </div>
 
-              {/* Academic Information */}
-              <div className="md:col-span-2 mt-4">
-                <h4 className="font-semibold text-slate-800 mb-4">Academic Information</h4>
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-500">Semester</h3>
+                <p className="mt-1 text-lg">{profile?.semester || 'Not specified'}</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Department</label>
-                <input 
-                  type="text"
-                  name="department"
-                  className="mt-1 p-2 w-full border border-slate-200 rounded-md bg-slate-50"
-                  value={formData.department}
-                  readOnly
-                />
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-500">Role</h3>
+                <p className="mt-1 text-lg capitalize">{profile?.role}</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Course</label>
-                <input 
-                  type="text"
-                  name="course"
-                  className="mt-1 p-2 w-full border rounded-md bg-slate-50"
-                  value={formData.course}
-                  readOnly
-                />
+              <div className="border rounded-md p-4 md:col-span-2">
+                <h3 className="text-sm font-medium text-gray-500">Member Since</h3>
+                <p className="mt-1 text-lg">
+                  {profile?.created_at
+                    ? new Date(profile.created_at).toLocaleDateString()
+                    : 'Unknown'}
+                </p>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Current Semester</label>
-                <input 
-                  type="text"
-                  name="semester"
-                  className="mt-1 p-2 w-full border rounded-md bg-slate-50"
-                  value={formData.semester}
-                  readOnly
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Batch</label>
-                <input 
-                  type="text"
-                  name="batch"
-                  className="mt-1 p-2 w-full border rounded-md bg-slate-50"
-                  value={formData.batch}
-                  readOnly
-                />
-              </div>
-
-              {/* Contact Information */}
-              <div className="md:col-span-2 mt-4">
-                <h4 className="font-semibold text-slate-800 mb-4">Contact Information</h4>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Email ID</label>
-                <input 
-                  type="email"
-                  name="email"
-                  className="mt-1 p-2 w-full border border-slate-200 rounded-md bg-slate-50"
-                  value={formData.email}
-                  readOnly
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Contact Number</label>
-                <input 
-                  type="tel"
-                  name="contactNumber"
-                  className={`mt-1 p-2 w-full border rounded-md ${isEditing ? 'bg-white' : 'bg-slate-50'}`}
-                  value={formData.contactNumber}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700">Residential Address</label>
-                <textarea 
-                  name="address"
-                  rows="2"
-                  className={`mt-1 p-2 w-full border rounded-md ${isEditing ? 'bg-white' : 'bg-slate-50'}`}
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                />
-              </div>
-            </form>
-
-            {/* Password Change Section */}
-            <div className="mt-8 pt-6 border-t border-slate-200">
-              <h4 className="font-semibold text-slate-800 mb-4">Security</h4>
-              <button 
-                className="px-6 py-2 bg-white border border-slate-200 text-slate-700 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-2"
-              >
-                <span>🔄</span>
-                Change Password
-              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
