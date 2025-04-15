@@ -1,4 +1,13 @@
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const ExamList = () => {
+  const navigate = useNavigate();
+
+  const handleStartExam = (examId) => {
+    navigate(`/student/exam-confirmation/${examId}`);
+  };
+
   return (
     <div className="p-6">
       <h3 className="text-2xl font-bold mb-6">Available Exams</h3>
