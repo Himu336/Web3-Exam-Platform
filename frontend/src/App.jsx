@@ -12,11 +12,15 @@ import StudentLogin from './pages/auth-page/student-auth';
 import FacultyLogin from './pages/auth-page/faculty-auth';
 import AdminLogin from './pages/auth-page/admin-auth';
 import StudentDashboard from './pages/dashboard/student/student-dashboard';
+<<<<<<< HEAD
+import ExamPage from './pages/exam-portal/exam-page'; // Import exam-page component
+=======
 import FacultyDashboard from './pages/dashboard/faculty/faculty-dashboard';
 import AdminDashboard from './pages/dashboard/admin/admin-dashboard';
 import NavigationBar from './components/navigation-bar';
 import ExamScreen from './pages/exam-screen';
 import ConfirmationPage from './pages/exam-screen/confirmation-page';
+>>>>>>> main
 
 // Protected Route Component for Faculty
 const ProtectedFacultyRoute = ({ children }) => {
@@ -184,6 +188,20 @@ function App() {
                               <Route path="/auth/faculty" element={<FacultyLogin />} />
                               <Route path="/auth/admin" element={<AdminLogin />} />
 
+<<<<<<< HEAD
+        {/* Exam Page Route */}
+        <Route path="/exam" element={<ExamPage />} />
+
+        {/* Protected Student Dashboard Route */}
+        <Route 
+          path="/student/dashboard/*" 
+          element={
+            <ProtectedRoute>
+              <StudentDashboard />
+            </ProtectedRoute>
+          } 
+        />
+=======
                               {/* Protected Student Dashboard Route */}
                               <Route 
                                 path="/student/dashboard/*" 
@@ -193,6 +211,7 @@ function App() {
                                   </ProtectedStudentRoute>
                                 } 
                               />
+>>>>>>> main
 
                               {/* Protected Faculty Dashboard Route */}
                               <Route 

@@ -11,10 +11,18 @@
   "description": "",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+<<<<<<< HEAD
+    "@openzeppelin/contracts": "^5.2.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.16.1",
+    "hardhat-ethers": "^1.0.1"
+=======
     "hardhat": "^2.23.0"
   },
   "dependencies": {
     "fs-extra": "^10.1.0",
     "picocolors": "^1.1.1"
+>>>>>>> main
   }
 }
